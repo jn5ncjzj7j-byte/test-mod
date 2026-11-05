@@ -1,19 +1,22 @@
 package dev.misg.shiftclickfix.mixin;
 
 import dev.misg.shiftclickfix.ShiftInputState;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Click;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.screen.slot.SlotActionType;
+import net.minecraft.text.Text;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(HandledScreen.class)
 public abstract class HandledScreenMixin {
-    @Inject(method = "mouseClicked(Lnet/minecraft/client/gui/Click;Z)Z", at = @At("HEAD"))
-    private void amethystShiftClickFix$captureMouseButton(Click click, boolean doubled, CallbackInfoReturnable<Boolean> cir) {
+    @Inject(method = "onMouseClick(Lnet/minecraft/client/gui/Click;)V", at = @At("HEAD"))
+    private void amethystShiftClickFix$captureMouseButton(Click click, CallbackInfo ci) {
         ShiftInputState.captureClick(click.button(), click.hasShift());
     }
 
@@ -28,5 +31,13 @@ public abstract class HandledScreenMixin {
         }
 
         return original;
+    }
+
+    @Inject(method = "render", at = @At("TAIL"))
+    private void amethystShiftClickFix$renderStatus(DrawContext context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
+        String shiftStatus = ShiftInputState.isShiftDown() ? "ON" : "OFF";
+        String clickStatus = ShiftInputState.wasLastClickForcedQuickMove() ? "QUICK_MOVE" : "NORMAL";
+        String status = "Shift: " + shiftStatus + " | Last click: " + clickStatus;
+        context.drawTextWithShadow(MinecraftClient.getInstance().textRenderer, Text.literal(status), 6, 6, 0xFFFFFF);
     }
 }
