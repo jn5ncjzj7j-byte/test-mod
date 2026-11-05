@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "package": "dev.misg.shiftclickfix.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "client": [
+    "KeyboardMixin",
+    "HandledScreenMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
