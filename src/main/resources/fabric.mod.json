@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "amethyst_shift_click_fix",
+  "version": "${version}",
+  "name": "Amethyst Shift-Click Fix",
+  "description": "Improves Shift + left-click quick-move handling for external keyboard and mouse input.",
+  "authors": ["misg"],
+  "license": "MIT",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "dev.misg.shiftclickfix.ShiftClickFixClient"
+    ]
+  },
+  "mixins": [
+    "amethyst_shift_click_fix.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.18.1",
+    "minecraft": "1.21.11",
+    "java": ">=21"
+  }
+}
