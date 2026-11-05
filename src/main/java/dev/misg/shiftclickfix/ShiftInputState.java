@@ -5,8 +5,9 @@ import org.lwjgl.glfw.GLFW;
 public final class ShiftInputState {
     private static volatile boolean leftShiftDown;
     private static volatile boolean rightShiftDown;
-    private static volatile boolean clickHasShift;
-    private static volatile int lastMouseButton = -1;
+    private static volatile int pendingMouseButton = -1;
+    private static volatile boolean pendingShiftClick;
+    private static volatile boolean lastClickForcedQuickMove;
 
     private ShiftInputState() {
     }
@@ -22,19 +23,24 @@ public final class ShiftInputState {
     }
 
     public static boolean isShiftDown() {
-        return leftShiftDown || rightShiftDown || clickHasShift;
+        return leftShiftDown || rightShiftDown;
     }
 
-    public static void captureClick(int button, boolean shiftModifier) {
-        lastMouseButton = button;
-        clickHasShift = shiftModifier;
+    public static void captureClick(int button, boolean clickHasShift) {
+        pendingMouseButton = button;
+        pendingShiftClick = button == GLFW.GLFW_MOUSE_BUTTON_1 && (clickHasShift || isShiftDown());
+        lastClickForcedQuickMove = false;
     }
 
     public static boolean consumeShiftLeftClick() {
-        int button = lastMouseButton;
-        lastMouseButton = -1;
-        boolean shift = isShiftDown();
-        clickHasShift = false;
-        return button == GLFW.GLFW_MOUSE_BUTTON_1 && shift;
+        boolean forceQuickMove = pendingMouseButton == GLFW.GLFW_MOUSE_BUTTON_1 && pendingShiftClick;
+        pendingMouseButton = -1;
+        pendingShiftClick = false;
+        lastClickForcedQuickMove = forceQuickMove;
+        return forceQuickMove;
+    }
+
+    public static boolean wasLastClickForcedQuickMove() {
+        return lastClickForcedQuickMove;
     }
 }
